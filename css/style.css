@@ -294,7 +294,18 @@ ul, ol { list-style: none; }
   position: absolute;
   inset: 0;
   background:
+    radial-gradient(ellipse 130% 95% at 50% 42%, transparent 52%, rgba(14, 11, 7, 0.6) 100%),
     linear-gradient(180deg, rgba(24, 19, 13, 0.72) 0%, rgba(24, 19, 13, 0.55) 45%, rgba(24, 19, 13, 0.78) 100%);
+}
+
+/* Ken Burns: slow settle on the hero photo. Uses the standalone `scale`
+   property so the JS parallax (which owns `transform`) can't override it. */
+.js-motion .hero-bg.has-photo {
+  animation: hero-kb 12s var(--ease-out) both;
+}
+@keyframes hero-kb {
+  from { scale: 1.08; }
+  to { scale: 1; }
 }
 
 .hero-content {
@@ -558,8 +569,7 @@ ul, ol { list-style: none; }
   background: var(--cream-deep);
   border: 1px solid var(--line);
 }
-.gallery-item:nth-child(4n + 1) { aspect-ratio: 4 / 5; }
-.gallery-item:nth-child(4n + 3) { aspect-ratio: 5 / 4; }
+/* uniform cells: every photo crops to the same square, rows align cleanly */
 
 .gallery-item img {
   width: 100%; height: 100%;
@@ -690,16 +700,41 @@ ul, ol { list-style: none; }
 .js-motion [data-reveal] {
   opacity: 0;
   transform: translateY(16px);
+  filter: blur(5px);
   transition:
     opacity var(--dur-slow) var(--ease-out),
-    transform var(--dur-slow) var(--ease-out);
+    transform var(--dur-slow) var(--ease-out),
+    filter var(--dur-slow) var(--ease-out);
   transition-delay: calc(var(--i, 0) * var(--stagger));
-  will-change: opacity, transform;
+  will-change: opacity, transform, filter;
 }
 .js-motion [data-reveal].is-revealed {
   opacity: 1;
   transform: none;
+  filter: none;
   will-change: auto;
+}
+
+/* Curtain reveal for photos: clips open from the reading-start edge (right
+   in RTL) while the image itself settles from a slight zoom. */
+.js-motion [data-reveal="wipe"] {
+  opacity: 1;
+  transform: none;
+  filter: none;
+  clip-path: inset(0 0 0 100%);
+  transition: clip-path 1000ms var(--ease-out);
+  transition-delay: calc(var(--i, 0) * var(--stagger));
+}
+.js-motion [data-reveal="wipe"] img {
+  scale: 1.08;
+  transition: scale 1300ms var(--ease-out);
+  transition-delay: calc(var(--i, 0) * var(--stagger));
+}
+.js-motion [data-reveal="wipe"].is-revealed {
+  clip-path: inset(0 0 0 0);
+}
+.js-motion [data-reveal="wipe"].is-revealed img {
+  scale: 1;
 }
 
 .js-motion [data-hero] > * {
@@ -710,6 +745,17 @@ ul, ol { list-style: none; }
     transform var(--dur-hero) var(--ease-out);
 }
 .js-motion [data-hero].is-entered > * { opacity: 1; transform: none; }
+
+/* Headline: masked line-by-line rise instead of the block fade */
+.hero-title .line { display: block; overflow: hidden; }
+.hero-title .line > span { display: block; }
+.js-motion [data-hero] > .hero-title { opacity: 1; transform: none; transition: none; }
+.js-motion [data-hero] .hero-title .line > span {
+  transform: translateY(115%);
+  transition: transform 900ms var(--ease-out);
+}
+.js-motion [data-hero].is-entered .hero-title .line:nth-child(1) > span { transform: none; transition-delay: 100ms; }
+.js-motion [data-hero].is-entered .hero-title .line:nth-child(2) > span { transform: none; transition-delay: 230ms; }
 .js-motion [data-hero].is-entered > :nth-child(1) { transition-delay: 0ms; }
 .js-motion [data-hero].is-entered > :nth-child(2) { transition-delay: 80ms; }
 .js-motion [data-hero].is-entered > :nth-child(3) { transition-delay: 160ms; }
@@ -757,5 +803,10 @@ ul, ol { list-style: none; }
   .js-motion [data-hero] > * {
     opacity: 1 !important;
     transform: none !important;
+    filter: none !important;
+    clip-path: none !important;
   }
+  .js-motion [data-reveal="wipe"] img { scale: 1 !important; }
+  .js-motion .hero-bg.has-photo { animation: none !important; scale: 1 !important; }
+  .js-motion .hero-title .line > span { transform: none !important; }
 }

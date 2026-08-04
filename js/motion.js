@@ -70,7 +70,7 @@
       (function (i) {
         var slot = document.createElement('figure');
         slot.className = 'gallery-item';
-        slot.setAttribute('data-reveal', '');
+        slot.setAttribute('data-reveal', 'wipe');
         if (i > VISIBLE_PLACEHOLDERS) slot.hidden = true;
         slot.innerHTML =
           '<div class="media-placeholder"><span class="ph-mark">T</span>' +
@@ -169,6 +169,7 @@
 
   /* ---------- Header state + hero parallax ---------- */
   var header = document.querySelector('.site-header');
+  var heroContent = document.querySelector('.hero-content');
   var parallaxLayers = Array.prototype.slice.call(document.querySelectorAll('[data-parallax]'));
   var allowParallax =
     parallaxLayers.length > 0 &&
@@ -190,6 +191,12 @@
           var offset = Math.min(y * depth, 24);
           layer.style.transform = 'translate3d(0,' + offset + 'px,0)';
         });
+      }
+      // cinematic pull-away: hero copy sinks and dims as you scroll past it
+      if (heroContent && allowParallax && y <= window.innerHeight) {
+        var p = Math.min(y / (window.innerHeight * 0.7), 1);
+        heroContent.style.opacity = String(1 - p * 0.9);
+        heroContent.style.transform = 'translate3d(0,' + (y * 0.12) + 'px,0)';
       }
       ticking = false;
     });
