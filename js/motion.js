@@ -131,6 +131,10 @@
     el.style.setProperty('--i', Math.min(i, 5));
   });
 
+  /* phones: trigger almost as soon as an element enters, so content
+     doesn't trail behind fast flick scrolling */
+  var eagerReveal = window.matchMedia('(max-width: 640px)').matches;
+
   var observer = null;
   if ('IntersectionObserver' in window) {
     observer = new IntersectionObserver(
@@ -143,7 +147,9 @@
           observer.unobserve(entry.target);
         });
       },
-      { rootMargin: '0px 0px -12% 0px', threshold: 0.15 }
+      eagerReveal
+        ? { rootMargin: '0px 0px -4% 0px', threshold: 0.05 }
+        : { rootMargin: '0px 0px -12% 0px', threshold: 0.15 }
     );
     revealTargets.forEach(function (el) { observer.observe(el); });
   } else {
@@ -157,7 +163,7 @@
   var pendingReveals = Array.prototype.slice.call(revealTargets);
   function sweepReveals() {
     if (!pendingReveals.length) return;
-    var line = window.innerHeight * 0.88;
+    var line = window.innerHeight * (eagerReveal ? 0.96 : 0.88);
     pendingReveals = pendingReveals.filter(function (el) {
       if (el.classList.contains('is-revealed')) return false;
       if (el.getBoundingClientRect().top >= line) return true;

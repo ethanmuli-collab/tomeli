@@ -699,12 +699,12 @@ ul, ol { list-style: none; }
    ===================================================== */
 .js-motion [data-reveal] {
   opacity: 0;
-  transform: translateY(16px);
-  filter: blur(5px);
+  transform: translateY(var(--reveal-rise, 16px));
+  filter: var(--reveal-blur, blur(5px));
   transition:
-    opacity var(--dur-slow) var(--ease-out),
-    transform var(--dur-slow) var(--ease-out),
-    filter var(--dur-slow) var(--ease-out);
+    opacity var(--reveal-dur, var(--dur-slow)) var(--ease-out),
+    transform var(--reveal-dur, var(--dur-slow)) var(--ease-out),
+    filter var(--reveal-dur, var(--dur-slow)) var(--ease-out);
   transition-delay: calc(var(--i, 0) * var(--stagger));
   will-change: opacity, transform, filter;
 }
@@ -722,12 +722,12 @@ ul, ol { list-style: none; }
   transform: none;
   filter: none;
   clip-path: inset(0 0 0 100%);
-  transition: clip-path 1000ms var(--ease-out);
+  transition: clip-path var(--wipe-dur, 1000ms) var(--ease-out);
   transition-delay: calc(var(--i, 0) * var(--stagger));
 }
 .js-motion [data-reveal="wipe"] img {
-  scale: 1.08;
-  transition: scale 1300ms var(--ease-out);
+  scale: var(--wipe-zoom, 1.08);
+  transition: scale var(--wipe-zoom-dur, 1300ms) var(--ease-out);
   transition-delay: calc(var(--i, 0) * var(--stagger));
 }
 .js-motion [data-reveal="wipe"].is-revealed {
@@ -775,6 +775,17 @@ ul, ol { list-style: none; }
 }
 
 @media (max-width: 640px) {
+  /* motion on phones: shorter, closer, no blur - flicks + slower GPUs make
+     the desktop timing read as laggy and smeared */
+  :root {
+    --reveal-rise: 10px;
+    --reveal-blur: none;
+    --reveal-dur: 360ms;
+    --stagger: 40ms;
+    --wipe-dur: 600ms;
+    --wipe-zoom: 1.04;
+    --wipe-zoom-dur: 800ms;
+  }
   .main-nav { display: none; }
   .menu-toggle { display: flex; }
   .desktop-only { display: none; }
