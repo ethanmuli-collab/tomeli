@@ -778,11 +778,12 @@ ul, ol { list-style: none; }
   .main-nav { display: none; }
   .menu-toggle { display: flex; }
   .desktop-only { display: none; }
+  .section { padding-block: 3.5rem; }
   .craft-grid { grid-template-columns: 1fr; }
   .process-list { grid-template-columns: 1fr; }
   .stats-grid { grid-template-columns: 1fr; }
   .stat + .stat { border-inline-start: 0; border-top: 1px solid var(--line); }
-  .stat { padding: 1.75rem 1rem; }
+  .stat { padding: 1.35rem 1rem; }
   .gallery-grid { grid-template-columns: 1fr; }
   .gallery-item:nth-child(n) { aspect-ratio: 4 / 3; }
   .hero-scroll { display: none; }
