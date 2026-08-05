@@ -150,6 +150,25 @@
     revealAll();
   }
 
+  /* Safety net: fast flicks (momentum scroll + image-decode jank) can jump
+     an element across the whole viewport between observer checks, leaving it
+     invisible forever. Sweep on every scroll frame and reveal anything whose
+     top has crossed the same line the observer watches. */
+  var pendingReveals = Array.prototype.slice.call(revealTargets);
+  function sweepReveals() {
+    if (!pendingReveals.length) return;
+    var line = window.innerHeight * 0.88;
+    pendingReveals = pendingReveals.filter(function (el) {
+      if (el.classList.contains('is-revealed')) return false;
+      if (el.getBoundingClientRect().top >= line) return true;
+      el.classList.add('is-revealed');
+      var counter = el.querySelector('[data-counter]');
+      if (counter) countUp(counter);
+      if (observer) observer.unobserve(el);
+      return false;
+    });
+  }
+
   /* ---------- Counters ---------- */
   function countUp(el) {
     var target = parseFloat(el.getAttribute('data-counter'));
@@ -185,6 +204,7 @@
         if (y > 24) header.classList.add('is-scrolled');
         else if (y < 8) header.classList.remove('is-scrolled');
       }
+      sweepReveals();
       if (allowParallax && y < window.innerHeight) {
         parallaxLayers.forEach(function (layer) {
           var depth = parseFloat(layer.getAttribute('data-parallax')) || 0.05;
